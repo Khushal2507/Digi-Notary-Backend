@@ -42,6 +42,11 @@ router.get("/getFiles/:id", async (req, res) => {
   res.json(userData.files);
 });
 
+router.get("/allFiles", async (req, res) => {
+  const allData = await User.find({}).populate("files");
+  res.json(allData);
+});
+
 router.post(
   "/uploadFile",
   upload.single("fileData"),

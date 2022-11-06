@@ -7,6 +7,7 @@ const userSchema = new Schema({
   username: String,
   email: String,
   password: String,
+  type: String,
   files: { type: [{ type: Schema.Types.ObjectId, ref: "File" }], default: [] },
 });
 
