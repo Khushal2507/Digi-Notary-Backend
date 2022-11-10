@@ -9,6 +9,7 @@ const userSchema = new Schema({
   password: String,
   type: String,
   files: { type: [{ type: Schema.Types.ObjectId, ref: "File" }], default: [] },
+  hash: { type: [String], default: [] },
 });
 
 module.exports = mongoose.model("User", userSchema);

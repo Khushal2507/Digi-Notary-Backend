@@ -15,6 +15,12 @@ router.get("/:userid", async (req, res) => {
   res.json(userData[0].files);
 });
 
+router.get("/chat/:userid", async (req, res) => {
+  const userid = req.params.userid;
+  const userData = await User.find({ _id: userid });
+  res.json(userData[0]);
+});
+
 router.post("/login", async (req, res) => {
   const db = await User.findOne({
     email: req.body.email,
