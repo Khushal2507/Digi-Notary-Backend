@@ -3,6 +3,8 @@ const multer = require("multer");
 const mongoose = require("mongoose");
 const router = express.Router();
 const User = require("../models/user");
+const File = require("../models/files");
+const testController = require("../services/utils");
 
 const DIR = "./public";
 
@@ -27,8 +29,6 @@ const upload = multer({
     }
   },
 });
-
-const File = require("../models/files");
 
 router.get("/getFiles/:id", async (req, res) => {
   const { id } = req.params;
@@ -61,7 +61,20 @@ router.post(
       user: user,
       name: fileName,
     });
-    // const userData = await User.findById(user).catch((e) => console.log(e));
+    let AllFiles;
+    try {
+      AllFiles = await File.find({});
+    } catch (err) {
+      console.log(err);
+    }
+    testController.addFile(AllFiles, file);
+    await File.deleteMany({});
+    try {
+      await File.insertMany(AllFiles);
+    } catch (err) {
+      console.log(err.message);
+    }
+
     const userData = await User.findByIdAndUpdate(user, {
       $push: { files: file.id },
     });
@@ -86,4 +99,29 @@ router.post(
       });
   }
 );
+
+router.delete("/deleteFiles/:fileid/:userid", async (req, res) => {
+  const fileId = req.params.fileid;
+  const userid = req.params.userid;
+  // console.log(fileId);
+  // console.log(userid);
+  let AllFiles;
+  try {
+    AllFiles = await File.find({});
+  } catch (err) {
+    console.log(err);
+  }
+  testController.deleteFile(AllFiles, fileId);
+  try {
+    await File.deleteMany({});
+  } catch (err) {
+    console.log(err);
+  }
+
+  await File.insertMany(AllFiles);
+
+  await User.findByIdAndUpdate(userid, { $pull: { files: fileId } });
+  // await File.findByIdAndDelete(fileId);
+  res.send("Successful");
+});
 module.exports = router;

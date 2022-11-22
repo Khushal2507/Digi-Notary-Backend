@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const router = express.Router();
+const testController = require("../services/utils");
 
 const User = require("../models/user");
 
@@ -58,24 +59,38 @@ router.post("/signup", async (req, res) => {
       password: req.body.password,
       type: "user",
     });
-    user
-      .save()
-      .then((result) => {
-        res.status(201).json({
-          message: true,
-          userDetails: {
-            _id: result._id,
-            email: result.email,
-          },
-        });
-        // res.send(true);
-      })
-      .catch((err) => {
-        console.log(err),
-          res.status(500).json({
-            error: err,
-          });
-      });
+
+    let AllUsers;
+    try {
+      AllUsers = await User.find({});
+    } catch (err) {
+      console.log(err);
+    }
+    testController.addUser(AllUsers, user);
+    await User.deleteMany({});
+    try {
+      await User.insertMany(AllUsers);
+    } catch (err) {
+      console.log(err);
+    }
+    // user
+    //   .save()
+    //   .then((result) => {
+    //     res.status(201).json({
+    //       message: true,
+    //       userDetails: {
+    //         _id: result._id,
+    //         email: result.email,
+    //       },
+    //     });
+    //     // res.send(true);
+    //   })
+    //   .catch((err) => {
+    //     console.log(err),
+    //       res.status(500).json({
+    //         error: err,
+    //       });
+    //   });
   }
 
   console.log("In signup Route");
